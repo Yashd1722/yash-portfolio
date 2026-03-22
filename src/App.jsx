@@ -69,7 +69,7 @@ function App() {
           <div className="container" style={{paddingTop: '0'}}>
             <div className="hero-content reveal">
               <div className="hero-tag">
-                <i className="fas fa-microchip"></i> AI Product & MLOps
+                <i className="fas fa-microchip"></i> ML Engineer & MLOps
               </div>
               <h1 className="hero-name">Yashkumar Dhameliya</h1>
               <h2 className="hero-title gradient-text">Machine Learning & Data Analyst</h2>
@@ -118,7 +118,7 @@ function App() {
                 <div className="timeline-dot"></div>
                 <div className="glass-card timeline-content">
                   <span className="date">Aug 2025 – Heute</span>
-                  <h3>AI Product & Operations Associate</h3>
+                  <h3>Machine Learning Engineer</h3>
                   <h4>Axinity GmbH & Co. KG · Liketik-Projekt</h4>
                   <ul>
                     <li>Datenanalyse, -bereinigung und Feature-Extraktion für ML-Modelle im E-Commerce</li>
@@ -240,7 +240,7 @@ function App() {
 
         <section id="skills" className="sec-skills">
           <div className="container reveal">
-            <h2 className="section-title">Realtime Tech Stack</h2>
+            <h2 className="section-title">Technical Stacks</h2>
             
             <div className="marquee-container">
               <div className="marquee-content">
