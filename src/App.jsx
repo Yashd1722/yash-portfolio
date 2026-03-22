@@ -5,7 +5,6 @@ function App() {
   const [navActive, setNavActive] = useState(false);
 
   useEffect(() => {
-    // Scroll Reveal Animation
     const revealElements = document.querySelectorAll('.reveal');
 
     const revealCallback = (entries, observer) => {
@@ -28,39 +27,32 @@ function App() {
       revealObserver.observe(el);
     });
 
-    const heroContent = document.querySelector('.hero-container.reveal');
+    const heroContent = document.querySelector('.hero-content');
     if (heroContent) {
-      heroContent.classList.add('active');
+      setTimeout(() => heroContent.classList.add('active'), 100);
     }
     
-    return () => {
-      revealObserver.disconnect();
-    };
+    return () => revealObserver.disconnect();
   }, []);
 
-  const toggleNav = () => {
-    setNavActive(!navActive);
-  };
-
-  const closeNav = () => {
-    setNavActive(false);
-  };
+  const toggleNav = () => setNavActive(!navActive);
+  const closeNav = () => setNavActive(false);
 
   return (
     <>
-      {/* Background Animated Blobs */}
-      <div className="bg-blobs">
-        <div className="blob blob-1"></div>
-        <div className="blob blob-2"></div>
-        <div className="blob blob-3"></div>
+      <div className="mesh-bg">
+        <div className="mesh-blob blob-1"></div>
+        <div className="mesh-blob blob-2"></div>
+        <div className="mesh-blob blob-3"></div>
       </div>
+      <div className="grid-overlay"></div>
 
-      {/* Navigation */}
-      <nav className="navbar glass">
+      <nav className="navbar">
         <div className="nav-container">
           <a href="#" className="logo">YD<span className="dot">.</span></a>
           <ul className={`nav-links ${navActive ? 'active' : ''}`}>
-            <li><a href="#about" onClick={closeNav}>Über mich</a></li>
+            <li><a href="#hero" onClick={closeNav}>Home</a></li>
+            <li><a href="#about" onClick={closeNav}>Zusammenfassung</a></li>
             <li><a href="#experience" onClick={closeNav}>Berufserfahrung</a></li>
             <li><a href="#education" onClick={closeNav}>Ausbildung</a></li>
             <li><a href="#projects" onClick={closeNav}>Projekte</a></li>
@@ -73,19 +65,20 @@ function App() {
       </nav>
 
       <main>
-        {/* Hero Section */}
-        <section id="hero" className="sec-hero">
-          <div className="hero-container reveal">
-            <div className="hero-content">
-              <p className="greeting">Hallo, ich bin</p>
-              <h1 className="name">Yashkumar Dhameliya</h1>
-              <h2 className="title gradient-text">Machine Learning & Data Analytics Spezialist</h2>
-              <p className="summary">
-                Mit Fokus auf datengetriebene KI-Lösungen, Feature Engineering, Zeitreihenanalyse und Computer Vision.
+        <section id="hero">
+          <div className="container" style={{paddingTop: '0'}}>
+            <div className="hero-content reveal">
+              <div className="hero-tag">
+                <i className="fas fa-microchip"></i> AI Product & MLOps
+              </div>
+              <h1 className="hero-name">Yashkumar Dhameliya</h1>
+              <h2 className="hero-title gradient-text">Machine Learning & Data Analyst</h2>
+              <p className="hero-summary">
+                Translating raw data into product-ready artificial intelligence. Specialized in time-series analysis, computer vision, and building resilient MLOps pipelines.
               </p>
               <div className="action-buttons">
-                <a href="mailto:yashdhameliya03@gmail.com" className="btn btn-primary">
-                  <i className="fas fa-paper-plane"></i> Kontaktieren
+                <a href="#experience" className="btn btn-primary">
+                  <i className="fas fa-rocket"></i> Meine Arbeit
                 </a>
                 <a href="https://github.com/Yashd1722" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
                   <i className="fab fa-github"></i> GitHub
@@ -98,40 +91,35 @@ function App() {
           </div>
         </section>
 
-        {/* About Section */}
         <section id="about" className="sec-about">
           <div className="container reveal">
             <h2 className="section-title">Zusammenfassung</h2>
-            <div className="glass-card about-card">
-              <p>
-                Machine Learning & Data Analytics-Spezialist mit Fokus auf datengetriebene KI-Lösungen, Feature Engineering, Zeitreihenanalyse und Computer Vision. Praktische Erfahrung in LLM-Analyse, AutoML-Entwicklung und produktnahen ML-Implementierungen (Axinity/Liketik). Masterarbeit: Entwicklung und Vergleich von ML-Modellen für Zeitreihenklassifikation mit synthetischen und realen Klimadaten.
+            <div className="glass-card">
+              <p style={{fontSize: '1.2rem', marginBottom: '2rem'}}>
+                Machine Learning & Data Analytics-Spezialist mit Fokus auf datengetriebene KI-Lösungen, Feature Engineering, Zeitreihenanalyse und Computer Vision. Praktische Erfahrung in LLM-Analyse, AutoML-Entwicklung und produktnahen ML-Implementierungen. Masterarbeit: Entwicklung und Vergleich von ML-Modellen für Zeitreihenklassifikation mit synthetischen und realen Klimadaten.
               </p>
-              <div className="contact-info">
-                <div className="contact-item">
-                  <i className="fas fa-map-marker-alt"></i>
-                  <span>Würzburg, DE</span>
+              <div style={{display: 'flex', gap: '2rem', borderTop: '1px solid var(--glass-border)', paddingTop: '2rem'}}>
+                <div style={{display: 'flex', alignItems: 'center', gap: '0.8rem', color: 'var(--text-muted)', fontSize: '1.1rem'}}>
+                  <i className="fas fa-map-marker-alt" style={{color: 'var(--color-primary)'}}></i> Würzburg, DE
                 </div>
-                <div className="contact-item">
-                  <i className="fas fa-phone"></i>
-                  <span>+49 157 582 787 54</span>
+                <div style={{display: 'flex', alignItems: 'center', gap: '0.8rem', color: 'var(--text-muted)', fontSize: '1.1rem'}}>
+                  <i className="fas fa-envelope" style={{color: 'var(--color-primary)'}}></i> yashdhameliya03@gmail.com
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Experience Section */}
         <section id="experience" className="sec-exp">
           <div className="container reveal">
             <h2 className="section-title">Berufserfahrung</h2>
             <div className="timeline">
-              {/* Job 1 */}
               <div className="timeline-item">
                 <div className="timeline-dot"></div>
                 <div className="glass-card timeline-content">
-                  <span className="date">August 2025 – Heute</span>
+                  <span className="date">Aug 2025 – Heute</span>
                   <h3>AI Product & Operations Associate</h3>
-                  <h4 className="company"><a href="https://www.axinity.dev/en" target="_blank" rel="noopener noreferrer" style={{color: "inherit", textDecoration: "none"}}>Axinity GmbH & Co. KG</a> · Liketik-Projekt · Werkstudent · Remote</h4>
+                  <h4>Axinity GmbH & Co. KG · Liketik-Projekt</h4>
                   <ul>
                     <li>Datenanalyse, -bereinigung und Feature-Extraktion für ML-Modelle im E-Commerce</li>
                     <li>Entwicklung geschäftsrelevanter KI-Lösungen mit KPI-Integration und Vektorgenerierung</li>
@@ -139,26 +127,24 @@ function App() {
                   </ul>
                 </div>
               </div>
-              {/* Job 2 */}
               <div className="timeline-item">
                 <div className="timeline-dot"></div>
                 <div className="glass-card timeline-content">
-                  <span className="date">April 2023 – Heute</span>
-                  <h3>Masterarbeit</h3>
-                  <h4 className="company">Synthetische Daten & Zeitreihenklassifikation – Abrupte Klimaübergänge</h4>
+                  <span className="date">Apr 2023 – Heute</span>
+                  <h3>Masterarbeit Researcher</h3>
+                  <h4>Zeitreihenklassifikation & Synthetische Daten</h4>
                   <ul>
                     <li>Entwicklung von Multiklass-Zeitreihenklassifikationsmodellen mit synthetischen und realen Klimadaten</li>
                     <li>Systematischer Vergleich klassischer ML-Ansätze vs. spezialisierte Zeitreihen-Modelle</li>
                   </ul>
                 </div>
               </div>
-              {/* Job 3 */}
               <div className="timeline-item">
                 <div className="timeline-dot"></div>
                 <div className="glass-card timeline-content">
-                  <span className="date">Mai 2021 – März 2023</span>
+                  <span className="date">Mai 2021 – Mär 2023</span>
                   <h3>Webentwickler</h3>
-                  <h4 className="company">Webcare Infoway · Shreeja Infotech</h4>
+                  <h4>Webcare Infoway · Shreeja Infotech</h4>
                   <ul>
                     <li>Entwicklung datengetriebener Web-Applikationen mit JavaScript, Java, Python und MySQL</li>
                   </ul>
@@ -168,80 +154,75 @@ function App() {
           </div>
         </section>
 
-        {/* Education Section */}
         <section id="education" className="sec-edu">
           <div className="container reveal">
             <h2 className="section-title">Ausbildung</h2>
             <div className="grid-2">
-              <div className="glass-card edu-card">
-                <div className="edu-icon"><i className="fas fa-university"></i></div>
-                <span className="date">März 2023 – Heute</span>
-                <h3>Master of Science in Informatik</h3>
-                <h4>Julius-Maximilians-Universität Würzburg</h4>
+              <div className="glass-card">
+                <i className="fas fa-university" style={{fontSize: '3rem', color: 'var(--color-secondary)', marginBottom: '1.5rem'}}></i>
+                <h3 style={{fontSize: '1.5rem', marginBottom: '0.5rem', color: 'white'}}>Master in Informatik</h3>
+                <h4 style={{color: 'var(--color-primary)', marginBottom: '1rem'}}>Julius-Maximilians-Universität</h4>
+                <p style={{color: 'var(--text-muted)'}}>März 2023 – Heute | Würzburg</p>
               </div>
-              <div className="glass-card edu-card">
-                <div className="edu-icon"><i className="fas fa-graduation-cap"></i></div>
-                <span className="date">Juni 2018 – Mai 2022</span>
-                <h3>Bachelor of Computer Science & Engineering</h3>
-                <h4>Marwadi University</h4>
-                <p className="grade">Notendurchschnitt: 1,9 (deutsche Äquivalenz), CGPA: 8.17/10</p>
+              <div className="glass-card">
+                <i className="fas fa-graduation-cap" style={{fontSize: '3rem', color: 'var(--color-secondary)', marginBottom: '1.5rem'}}></i>
+                <h3 style={{fontSize: '1.5rem', marginBottom: '0.5rem', color: 'white'}}>Bachelor in CS & Engineering</h3>
+                <h4 style={{color: 'var(--color-primary)', marginBottom: '1rem'}}>Marwadi University</h4>
+                <p style={{color: 'var(--text-muted)', marginBottom: '1rem'}}>Juni 2018 – Mai 2022</p>
+                <div style={{paddingTop: '1rem', borderTop: '1px solid var(--glass-border)', fontSize: '0.95rem', color: 'var(--text-muted)'}}>
+                  Notendurchschnitt: 1,9 (deutsche Äquivalenz) | CGPA: 8.17/10
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Projects Section */}
         <section id="projects" className="sec-projects">
           <div className="container reveal">
             <h2 className="section-title">Projekte</h2>
             <div className="grid-2">
-              {/* Project 1 */}
               <div className="glass-card project-card">
                 <div className="project-header">
                   <h3>NN-GPT: Rethinking AutoML with LLMs</h3>
                   <span className="badge">2024</span>
                 </div>
-                <p className="subtitle">LLM, AutoML</p>
+                <p className="subtitle">LLM & AutoML Architecture</p>
                 <ul>
-                  <li>LLM-gestützte Prognose von Modellgenauigkeit und optimaler Trainingsdauer für Computer-Vision-Modelle basierend auf frühen Epochen</li>
-                  <li>Veröffentlichung einer wissenschaftlichen Arbeit zur Dokumentation der Experimente und Ergebnisse</li>
+                  <li>LLM-gestützte Prognose von Modellgenauigkeit basierend auf frühen Epochen.</li>
+                  <li>Wissenschaftliche Publikation zur Dokumentation von Experimenten und AutoML Innovation.</li>
                 </ul>
-                <div style={{ marginTop: '1.5rem' }}>
-                  <a href="https://www.researchgate.net/publication/397983532_NNGPT_Rethinking_AutoML_with_Large_Language_Models" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
-                    <i className="fas fa-external-link-alt"></i> Publikation ansehen
-                  </a>
-                </div>
+                <a href="https://www.researchgate.net/publication/397983532_NNGPT_Rethinking_AutoML_with_Large_Language_Models" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                  <i className="fas fa-external-link-alt"></i> Publikation
+                </a>
               </div>
-              {/* Project 2 */}
+              
               <div className="glass-card project-card">
                 <div className="project-header">
                   <h3>LEMUR Neural Network Dataset</h3>
                   <span className="badge">2024</span>
                 </div>
-                <p className="subtitle">AutoML, PyTorch</p>
+                <p className="subtitle">AutoML, PyTorch, Optuna</p>
                 <ul>
-                  <li>PyTorch-basiertes AutoML-Framework mit Optuna-Integration für reproduzierbare und skalierbare KI-Experimente</li>
-                  <li>Veröffentlichung einer wissenschaftlichen Arbeit zur Dokumentation der Implementierung</li>
+                  <li>PyTorch-basiertes AutoML-Framework mit Optuna für skalierbare KI-Experimente.</li>
+                  <li>Publizierte Methodik mit Open-Access Architektur.</li>
                 </ul>
-                <div style={{ marginTop: '1.5rem' }}>
-                  <a href="https://arxiv.org/abs/2504.10552" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
-                    <i className="fas fa-external-link-alt"></i> Publikation ansehen
-                  </a>
-                </div>
+                <a href="https://arxiv.org/abs/2504.10552" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                  <i className="fas fa-external-link-alt"></i> Publikation
+                </a>
               </div>
-              {/* Project 3 */}
+
               <div className="glass-card project-card">
                 <div className="project-header">
-                  <h3>INSTRUCT-IR – Robustheit von Vision-Language-Modellen</h3>
+                  <h3>INSTRUCT-IR – VLM Robustness</h3>
                   <span className="badge">2023</span>
                 </div>
                 <p className="subtitle">Computer Vision, VLMs</p>
                 <ul>
-                  <li>Untersuchung der Robustheit von VLMs bei verschiedenen Bilddegradierungen</li>
-                  <li>Analyse von Bildqualität, Generalisierung und Modellstabilität</li>
+                  <li>Untersuchung der Robustheit von Vision-Language Modellen bei Bilddegradierung.</li>
+                  <li>Analyse von Generalisierung und Modellstabilität unter Extrembedingungen.</li>
                 </ul>
               </div>
-              {/* Project 4 */}
+
               <div className="glass-card project-card">
                 <div className="project-header">
                   <h3>Gender Classification</h3>
@@ -249,65 +230,74 @@ function App() {
                 </div>
                 <p className="subtitle">Computer Vision, OpenCV</p>
                 <ul>
-                  <li>Entwicklung eines Geschlechtserkennungssystems mit OpenCV (93% Genauigkeit)</li>
-                  <li>Implementierung einer robusten Vorverarbeitungspipeline mit Datenaugmentation</li>
+                  <li>Entwicklung eines Geschlechtserkennungssystems (93% Gen.) mit OpenCV.</li>
+                  <li>Robuste Vorverarbeitungspipeline mit intensiver Datenaugmentation.</li>
                 </ul>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Skills Section */}
         <section id="skills" className="sec-skills">
           <div className="container reveal">
-            <h2 className="section-title">Kenntnisse & Sprachen</h2>
+            <h2 className="section-title">Realtime Tech Stack</h2>
             
-            <div className="skills-wrapper">
-              <div className="glass-card skills-card">
-                <h3><i className="fas fa-brain"></i> ML / KI</h3>
-                <div className="tags">
-                  <span className="tag">PyTorch</span>
-                  <span className="tag">Scikit-learn</span>
-                  <span className="tag">Transformers</span>
-                  <span className="tag">Pandas</span>
-                  <span className="tag">NumPy</span>
-                  <span className="tag">Feature Engineering</span>
-                  <span className="tag">Zeitreihenanalyse</span>
-                  <span className="tag">NLP</span>
-                  <span className="tag">LLMs</span>
-                  <span className="tag">Computer Vision</span>
-                  <span className="tag">Hugging Face</span>
-                  <span className="tag">AutoML</span>
-                  <span className="tag">Optuna</span>
-                </div>
+            <div className="marquee-container">
+              <div className="marquee-content">
+                {[...Array(2)].map((_, idx) => (
+                  <React.Fragment key={idx}>
+                    <div className="marquee-tag"><i className="fas fa-brain"></i> PyTorch</div>
+                    <div className="marquee-tag purple"><i className="fas fa-network-wired"></i> Transformers</div>
+                    <div className="marquee-tag"><i className="fas fa-chart-line"></i> Scikit-learn</div>
+                    <div className="marquee-tag purple"><i className="fas fa-table"></i> Pandas</div>
+                    <div className="marquee-tag"><i className="fas fa-square-root-alt"></i> NumPy</div>
+                    <div className="marquee-tag purple"><i className="fas fa-diagram-project"></i> Feature Eng.</div>
+                    <div className="marquee-tag"><i className="fas fa-clock"></i> Zeitreihenanalyse</div>
+                    <div className="marquee-tag purple"><i className="fas fa-robot"></i> NLP</div>
+                    <div className="marquee-tag"><i className="fas fa-microchip"></i> LLMs</div>
+                    <div className="marquee-tag purple"><i className="fas fa-eye"></i> Computer Vision</div>
+                    <div className="marquee-tag"><i className="fas fa-laugh-beam"></i> Hugging Face</div>
+                    <div className="marquee-tag purple"><i className="fas fa-cogs"></i> AutoML</div>
+                  </React.Fragment>
+                ))}
               </div>
-              
-              <div className="glass-card skills-card">
-                <h3><i className="fas fa-database"></i> Datenbanken / Web</h3>
-                <div className="tags">
-                  <span className="tag">JavaScript</span>
-                  <span className="tag">Flask</span>
-                  <span className="tag">FastAPI</span>
-                  <span className="tag">HTML/CSS</span>
-                  <span className="tag">MySQL</span>
-                  <span className="tag">MongoDB</span>
-                </div>
-              </div>
+            </div>
 
-              <div className="grid-2 mt-4">
-                <div className="glass-card skills-card">
-                  <h3><i className="fas fa-server"></i> DevOps</h3>
-                  <div className="tags">
-                    <span className="tag">Kubernetes</span>
-                    <span className="tag">Git</span>
+            <div className="marquee-container">
+              <div className="marquee-content reverse">
+                {[...Array(2)].map((_, idx) => (
+                  <React.Fragment key={idx}>
+                    <div className="marquee-tag purple"><i className="fab fa-python"></i> Python</div>
+                    <div className="marquee-tag"><i className="fab fa-js"></i> JavaScript</div>
+                    <div className="marquee-tag purple"><i className="fas fa-pepper-hot"></i> Flask</div>
+                    <div className="marquee-tag"><i className="fas fa-bolt"></i> FastAPI</div>
+                    <div className="marquee-tag purple"><i className="fas fa-database"></i> MySQL</div>
+                    <div className="marquee-tag"><i className="fas fa-leaf"></i> MongoDB</div>
+                    <div className="marquee-tag purple"><i className="fas fa-server"></i> MLOps</div>
+                    <div className="marquee-tag"><i className="fab fa-docker"></i> Docker</div>
+                    <div className="marquee-tag"><i className="fas fa-dharmachakra"></i> Kubernetes</div>
+                    <div className="marquee-tag purple"><i className="fab fa-git-alt"></i> Git</div>
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid-2" style={{marginTop: '4rem'}}>
+              <div className="glass-card workflow-card">
+                <h3><i className="fas fa-chart-pie"></i> Data Science Workflow</h3>
+                <p style={{color: 'var(--text-muted)', fontSize: '1.1rem'}}>
+                  Expertise connecting exploratory data engineering, resilient feature extraction, optimal model deployment, and KPI-monitored infrastructure.
+                </p>
+              </div>
+              <div className="glass-card workflow-card">
+                <h3><i className="fas fa-language"></i> Sprachen</h3>
+                <div style={{display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem', width: '100%'}}>
+                  <div style={{display: 'flex', justifyContent: 'space-between', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid var(--glass-border)'}}>
+                    <strong style={{color: 'white'}}>Englisch</strong> <span style={{color: 'var(--color-primary)'}}>B1 (Gute Kenntnisse)</span>
                   </div>
-                </div>
-                <div className="glass-card skills-card">
-                  <h3><i className="fas fa-language"></i> Sprachen</h3>
-                  <ul className="lang-list">
-                    <li><strong>Englisch:</strong> B1 (Gute Kenntnisse)</li>
-                    <li><strong>Deutsch:</strong> A2 (Grundkenntnisse)</li>
-                  </ul>
+                  <div style={{display: 'flex', justifyContent: 'space-between', padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid var(--glass-border)'}}>
+                    <strong style={{color: 'white'}}>Deutsch</strong> <span style={{color: 'var(--color-primary)'}}>A2 (Grundkenntnisse)</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -315,9 +305,9 @@ function App() {
         </section>
       </main>
 
-      <footer className="glass">
+      <footer>
         <div className="footer-content">
-          <p>&copy; 2024 Yashkumar Dhameliya. All rights reserved.</p>
+          <p style={{fontFamily: 'Space Grotesk'}}>&copy; 2024 Yashkumar Dhameliya. Engineering Intelligence.</p>
           <div className="footer-links">
             <a href="https://github.com/Yashd1722" target="_blank" rel="noopener noreferrer"><i className="fab fa-github"></i></a>
             <a href="https://www.linkedin.com/in/yashkumar-dhameliya" target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin-in"></i></a>

@@ -7,11 +7,17 @@ View the live portfolio here: **[yashd1722.github.io/yash-portfolio](https://Yas
 
 ---
 
+## ✨ Portfolio Features
+- **Realtime Animated Stacks**: Custom infinite scrolling marquees showcasing core skills across ML, Backend, and DevOps.
+- **Premium Data-Driven Aesthetic**: A modern web interface utilizing Glassmorphism, CSS Variables, and CSS Grid/Flexbox to present a data-focussed identity.
+
+---
+
 ## 💻 Tech Stack (Portfolio Website)
 This project was built from scratch utilizing modern web development tools:
 - **[React](https://react.dev/)** - Frontend UI library
 - **[Vite](https://vitejs.dev/)** - Next-generation frontend tooling and bundler
-- **Vanilla CSS** - Custom styling featuring Glassmorphism, CSS Variables, and CSS Grid/Flexbox
+- **Vanilla CSS** - Custom styling with dynamic CSS keyframes
 - **GitHub Pages** - Fast and free hosting
 
 ---
