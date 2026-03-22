@@ -90,7 +90,7 @@ function App() {
                 <a href="https://github.com/Yashd1722" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
                   <i className="fab fa-github"></i> GitHub
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                <a href="https://www.linkedin.com/in/yashkumar-dhameliya" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
                   <i className="fab fa-linkedin-in"></i> LinkedIn
                 </a>
               </div>
@@ -131,7 +131,7 @@ function App() {
                 <div className="glass-card timeline-content">
                   <span className="date">August 2025 – Heute</span>
                   <h3>AI Product & Operations Associate</h3>
-                  <h4 className="company">Axinity GmbH & Co. KG · Liketik-Projekt · Werkstudent · Remote</h4>
+                  <h4 className="company"><a href="https://www.axinity.dev/en" target="_blank" rel="noopener noreferrer" style={{color: "inherit", textDecoration: "none"}}>Axinity GmbH & Co. KG</a> · Liketik-Projekt · Werkstudent · Remote</h4>
                   <ul>
                     <li>Datenanalyse, -bereinigung und Feature-Extraktion für ML-Modelle im E-Commerce</li>
                     <li>Entwicklung geschäftsrelevanter KI-Lösungen mit KPI-Integration und Vektorgenerierung</li>
@@ -207,7 +207,7 @@ function App() {
                   <li>Veröffentlichung einer wissenschaftlichen Arbeit zur Dokumentation der Experimente und Ergebnisse</li>
                 </ul>
                 <div style={{ marginTop: '1.5rem' }}>
-                  <a href="#" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
+                  <a href="https://www.researchgate.net/publication/397983532_NNGPT_Rethinking_AutoML_with_Large_Language_Models" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
                     <i className="fas fa-external-link-alt"></i> Publikation ansehen
                   </a>
                 </div>
@@ -224,7 +224,7 @@ function App() {
                   <li>Veröffentlichung einer wissenschaftlichen Arbeit zur Dokumentation der Implementierung</li>
                 </ul>
                 <div style={{ marginTop: '1.5rem' }}>
-                  <a href="#" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
+                  <a href="https://arxiv.org/abs/2504.10552" target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '0.4rem 1rem', fontSize: '0.9rem' }}>
                     <i className="fas fa-external-link-alt"></i> Publikation ansehen
                   </a>
                 </div>
@@ -320,6 +320,7 @@ function App() {
           <p>&copy; 2024 Yashkumar Dhameliya. All rights reserved.</p>
           <div className="footer-links">
             <a href="https://github.com/Yashd1722" target="_blank" rel="noopener noreferrer"><i className="fab fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/yashkumar-dhameliya" target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin-in"></i></a>
             <a href="mailto:yashdhameliya03@gmail.com"><i className="fas fa-envelope"></i></a>
           </div>
         </div>
