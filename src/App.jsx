@@ -318,7 +318,7 @@ def introduce_network():
                 <InteractiveCard className="timeline-content">
                   <span className="date">Epoch 08/2025 to 01/2026</span>
                   <h3>Machine Learning Engineer</h3>
-                  <h4>axinity.dev </h4>
+                  <h4><a href="https://www.axinity.dev/en/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>axinity.dev</a></h4>
                   <ul>
                     <li>Dynamic data analysis, cleaning and feature extraction for E-commerce ML models.</li>
                     <li>Real-time processing of business-relevant AI workflows.</li>
@@ -378,9 +378,14 @@ def introduce_network():
                   <li>Interactive LLM-supported forecasting of model accuracy based on early training states.</li>
                   <li>Scientific publication documenting dynamic metrics.</li>
                 </ul>
-                <a href="https://www.researchgate.net/publication/397983532_NNGPT_Rethinking_AutoML_with_Large_Language_Models" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
-                  <i className="fas fa-link"></i> Access Node
-                </a>
+                <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+                  <a href="https://www.researchgate.net/publication/397983532_NNGPT_Rethinking_AutoML_with_Large_Language_Models" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                    <i className="fas fa-link"></i> Access Node
+                  </a>
+                  <a href="https://github.com/Yashd1722/nn-gpt" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                    <i className="fab fa-github"></i> GitHub
+                  </a>
+                </div>
               </InteractiveCard>
 
               <InteractiveCard className="project-card">
@@ -393,9 +398,14 @@ def introduce_network():
                   <li>PyTorch-based AutoML framework designed for real-time validation.</li>
                   <li>Published methodology with interactive open-access data logs.</li>
                 </ul>
-                <a href="https://arxiv.org/abs/2504.10552" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
-                  <i className="fas fa-folder-open"></i> Query Data
-                </a>
+                <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+                  <a href="https://arxiv.org/abs/2504.10552" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                    <i className="fas fa-folder-open"></i> Query Data
+                  </a>
+                  <a href="https://github.com/Yashd1722/nn-dataset" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                    <i className="fab fa-github"></i> GitHub
+                  </a>
+                </div>
               </InteractiveCard>
 
               <InteractiveCard className="project-card">
@@ -408,6 +418,9 @@ def introduce_network():
                   <li>Investigated model generalization under dynamic image conditions.</li>
                   <li>Active stress-testing of visual modalities.</li>
                 </ul>
+                <a href="https://github.com/Yashd1722/instruct-" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                  <i className="fab fa-github"></i> GitHub
+                </a>
               </InteractiveCard>
 
               <InteractiveCard className="project-card">
