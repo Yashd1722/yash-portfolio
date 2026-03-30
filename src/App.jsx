@@ -236,12 +236,13 @@ def introduce_network():
         <div className="nav-container">
           <a href="#" className="logo">YD<span className="dot">_</span></a>
           <ul className={`nav-links ${navActive ? 'active' : ''}`}>
-            <li><a href="#hero" onClick={closeNav}>// Init_Node</a></li>
-            <li><a href="#about" onClick={closeNav}>// Layer_1_Summary</a></li>
-            <li><a href="#experience" onClick={closeNav}>// Training_Logs</a></li>
-            <li><a href="#education" onClick={closeNav}>// Knowledge_Base</a></li>
-            <li><a href="#projects" onClick={closeNav}>// Deployed_Models</a></li>
-            <li><a href="#skills" onClick={closeNav}>// Tensor_Stack</a></li>
+            <li><a href="#hero" onClick={closeNav}>Init_Node</a></li>
+            <li><a href="#about" onClick={closeNav}>Layer_1_Summary</a></li>
+            <li><a href="#experience" onClick={closeNav}>Training_Logs</a></li>
+            <li><a href="#education" onClick={closeNav}>Knowledge_Base</a></li>
+            <li><a href="#projects" onClick={closeNav}>Deployed_Models</a></li>
+            <li><a href="#skills" onClick={closeNav}>Tensor_Stack</a></li>
+            <li><a href="#languages" onClick={closeNav}>Lang_Protocols</a></li>
           </ul>
           <div className="hamburger" onClick={toggleNav}>
             {navActive ? <i className="fas fa-times"></i> : <i className="fas fa-diagram-project"></i>}
