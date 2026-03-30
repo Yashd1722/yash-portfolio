@@ -315,9 +315,9 @@ def introduce_network():
               <div className="timeline-item">
                 <div className="timeline-dot"></div>
                 <InteractiveCard className="timeline-content">
-                  <span className="date">Epoch 01/2026 – Present</span>
+                  <span className="date">08/2025 – 01/2026</span>
                   <h3>Machine Learning Engineer</h3>
-                  <h4>Axinity GmbH & Co. KG</h4>
+                  <h4>axinity.dev</h4>
                   <ul>
                     <li>Dynamic data analysis, cleaning and feature extraction for E-commerce ML models.</li>
                     <li>Real-time processing of business-relevant AI workflows.</li>
