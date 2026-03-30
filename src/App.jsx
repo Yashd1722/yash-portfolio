@@ -477,6 +477,35 @@ def introduce_network():
             </div>
           </div>
         </section>
+
+        {/* Sprachen (Languages) */}
+        <section id="languages">
+          <div className="container reveal">
+            <h2 className="section-title">Language Protocols (Sprachen)</h2>
+            <div className="grid-2">
+              <InteractiveCard className="edu-card">
+                <div style={{ fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: '1.2rem' }}><i className="fas fa-language"></i></div>
+                <h3>English</h3>
+                <h4 style={{ color: 'var(--color-secondary)' }}>B2 – Upper Intermediate</h4>
+                <div style={{ marginTop: '1rem' }}>
+                  <div style={{ background: 'var(--bg-surface-high)', borderRadius: '8px', height: '8px', overflow: 'hidden' }}>
+                    <div style={{ width: '75%', height: '100%', background: 'linear-gradient(90deg, var(--color-primary), var(--color-secondary))', borderRadius: '8px' }}></div>
+                  </div>
+                </div>
+              </InteractiveCard>
+              <InteractiveCard className="edu-card">
+                <div style={{ fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: '1.2rem' }}><i className="fas fa-language"></i></div>
+                <h3>Deutsch</h3>
+                <h4 style={{ color: 'var(--color-secondary)' }}>A2 – Elementary</h4>
+                <div style={{ marginTop: '1rem' }}>
+                  <div style={{ background: 'var(--bg-surface-high)', borderRadius: '8px', height: '8px', overflow: 'hidden' }}>
+                    <div style={{ width: '35%', height: '100%', background: 'linear-gradient(90deg, var(--color-primary), var(--color-secondary))', borderRadius: '8px' }}></div>
+                  </div>
+                </div>
+              </InteractiveCard>
+            </div>
+          </div>
+        </section>
       </main>
 
       <footer>
