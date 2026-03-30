@@ -318,7 +318,7 @@ def introduce_network():
                 <InteractiveCard className="timeline-content">
                   <span className="date">Epoch 08/2025 to 01/2026</span>
                   <h3>Machine Learning Engineer</h3>
-                  <h4>axinity.dev</h4>
+                  <h4>axinity.dev <a href="https://www.researchgate.net/publication/397983532_NNGPT_Rethinking_AutoML_with_Large_Language_Models" target="_blank" rel="noopener noreferrer"></a></h4>
                   <ul>
                     <li>Dynamic data analysis, cleaning and feature extraction for E-commerce ML models.</li>
                     <li>Real-time processing of business-relevant AI workflows.</li>
@@ -347,17 +347,17 @@ def introduce_network():
             <h2 className="section-title">Knowledge Base (Ausbildung)</h2>
             <div className="grid-2">
               <InteractiveCard className="edu-card">
-                <div style={{fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: '1.2rem'}}><i className="fas fa-university"></i></div>
+                <div style={{ fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: '1.2rem' }}><i className="fas fa-university"></i></div>
                 <span className="date">Epoch 03/2023 – Present</span>
                 <h3>Master of Science in Informatik</h3>
                 <h4>Julius-Maximilians-Universität Würzburg</h4>
               </InteractiveCard>
               <InteractiveCard className="edu-card">
-                <div style={{fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: '1.2rem'}}><i className="fas fa-graduation-cap"></i></div>
+                <div style={{ fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: '1.2rem' }}><i className="fas fa-graduation-cap"></i></div>
                 <span className="date">Epoch 06/2018 – 05/2022</span>
                 <h3>Bachelor of Computer Science & Engineering</h3>
                 <h4>Marwadi University</h4>
-                <p style={{color: 'var(--text-muted)', marginTop: '0.5rem'}}>Notendurchschnitt: 1,9 (deutsche Äquivalenz) | CGPA: 8.17/10</p>
+                <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem' }}>Notendurchschnitt: 1,9 (deutsche Äquivalenz) | CGPA: 8.17/10</p>
               </InteractiveCard>
             </div>
           </div>
