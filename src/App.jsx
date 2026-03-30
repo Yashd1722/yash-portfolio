@@ -239,6 +239,7 @@ def introduce_network():
             <li><a href="#hero" onClick={closeNav}>// Init_Node</a></li>
             <li><a href="#about" onClick={closeNav}>// Layer_1_Summary</a></li>
             <li><a href="#experience" onClick={closeNav}>// Training_Logs</a></li>
+            <li><a href="#education" onClick={closeNav}>// Knowledge_Base</a></li>
             <li><a href="#projects" onClick={closeNav}>// Deployed_Models</a></li>
             <li><a href="#skills" onClick={closeNav}>// Tensor_Stack</a></li>
           </ul>
@@ -315,7 +316,7 @@ def introduce_network():
               <div className="timeline-item">
                 <div className="timeline-dot"></div>
                 <InteractiveCard className="timeline-content">
-                  <span className="date">08/2025 – 01/2026</span>
+                  <span className="date">Epoch 08/2025 to 01/2026</span>
                   <h3>Machine Learning Engineer</h3>
                   <h4>axinity.dev</h4>
                   <ul>
@@ -327,7 +328,7 @@ def introduce_network():
               <div className="timeline-item">
                 <div className="timeline-dot"></div>
                 <InteractiveCard className="timeline-content">
-                  <span className="date">Epoch  Running</span>
+                  <span className="date">Epoch Present</span>
                   <h3>Masterarbeit Researcher</h3>
                   <h4>Time Series & Synthetic Data Generation</h4>
                   <ul>
@@ -336,6 +337,28 @@ def introduce_network():
                   </ul>
                 </InteractiveCard>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Education Section */}
+        <section id="education">
+          <div className="container reveal">
+            <h2 className="section-title">Knowledge Base (Ausbildung)</h2>
+            <div className="grid-2">
+              <InteractiveCard className="edu-card">
+                <div style={{fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: '1.2rem'}}><i className="fas fa-university"></i></div>
+                <span className="date">Epoch 03/2023 – Present</span>
+                <h3>Master of Science in Informatik</h3>
+                <h4>Julius-Maximilians-Universität Würzburg</h4>
+              </InteractiveCard>
+              <InteractiveCard className="edu-card">
+                <div style={{fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: '1.2rem'}}><i className="fas fa-graduation-cap"></i></div>
+                <span className="date">Epoch 06/2018 – 05/2022</span>
+                <h3>Bachelor of Computer Science & Engineering</h3>
+                <h4>Marwadi University</h4>
+                <p style={{color: 'var(--text-muted)', marginTop: '0.5rem'}}>Notendurchschnitt: 1,9 (deutsche Äquivalenz) | CGPA: 8.17/10</p>
+              </InteractiveCard>
             </div>
           </div>
         </section>
