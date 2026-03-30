@@ -327,7 +327,7 @@ def introduce_network():
               <div className="timeline-item">
                 <div className="timeline-dot"></div>
                 <InteractiveCard className="timeline-content">
-                  <span className="date">Epoch 2023 – Present</span>
+                  <span className="date">Epoch  Running</span>
                   <h3>Masterarbeit Researcher</h3>
                   <h4>Time Series & Synthetic Data Generation</h4>
                   <ul>
