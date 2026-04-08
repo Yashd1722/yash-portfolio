@@ -1,575 +1,844 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback, Suspense } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Float, Sphere, MeshDistortMaterial, OrbitControls, View } from '@react-three/drei';
+import { motion, useInView } from 'framer-motion';
+import * as THREE from 'three';
 import './index.css';
 
-// Neural Network Interactive Background
-const NeuralNetworkCanvas = () => {
-  const canvasRef = useRef(null);
+// ═══════════════════════════════════════════════
+// UNIQUE 3D EFFECTS (Per Section)
+// ═══════════════════════════════════════════════
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let width, height;
-    let particles = [];
-    let animationFrameId;
-    let mouse = { x: null, y: null, radius: 180 };
-
-    const init = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
-
-      particles = [];
-      const numParticles = Math.min((width * height) / 9000, 120);
-
-      for (let i = 0; i < numParticles; i++) {
-        particles.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.8,
-          vy: (Math.random() - 0.5) * 0.8,
-          radius: Math.random() * 2 + 1.5,
-          color: Math.random() > 0.5 ? '#72dcff' : '#dd8bfb' // Primary or Secondary color
-        });
-      }
-    };
-
-    const draw = () => {
-      ctx.clearRect(0, 0, width, height);
-
-      for (let i = 0; i < particles.length; i++) {
-        let p1 = particles[i];
-
-        // Move
-        p1.x += p1.vx;
-        p1.y += p1.vy;
-
-        // Bounce
-        if (p1.x < 0 || p1.x > width) p1.vx *= -1;
-        if (p1.y < 0 || p1.y > height) p1.vy *= -1;
-
-        // Draw particle
-        ctx.fillStyle = p1.color;
-        ctx.beginPath();
-        ctx.arc(p1.x, p1.y, p1.radius, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Connect with other particles
-        for (let j = i + 1; j < particles.length; j++) {
-          let p2 = particles[j];
-          let dx = p1.x - p2.x;
-          let dy = p1.y - p2.y;
-          let dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 130) {
-            ctx.beginPath();
-            ctx.strokeStyle = p1.color === '#dd8bfb' || p2.color === '#dd8bfb'
-              ? `rgba(221, 139, 251, ${1 - dist / 130})`
-              : `rgba(114, 220, 255, ${1 - dist / 130})`;
-            ctx.lineWidth = 1;
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
-          }
-        }
-
-        // Connect and attract to mouse
-        if (mouse.x != null && mouse.y != null) {
-          let dx = p1.x - mouse.x;
-          let dy = p1.y - mouse.y;
-          let dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < mouse.radius) {
-            ctx.beginPath();
-            // Intense tertiary color connection when user interacts
-            ctx.strokeStyle = `rgba(184, 255, 233, ${1 - dist / mouse.radius})`;
-            ctx.lineWidth = 2;
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(mouse.x, mouse.y);
-            ctx.stroke();
-
-            // Interaction physics: nodes are attracted to the mouse to simulate "user query processing"
-            p1.x -= dx * 0.015;
-            p1.y -= dy * 0.015;
-          }
-        }
-      }
-      animationFrameId = requestAnimationFrame(draw);
-    };
-
-    const handleResize = () => init();
-    const handleMouseMove = (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    };
-    const handleMouseOut = () => {
-      mouse.x = null;
-      mouse.y = null;
-    };
-
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseout', handleMouseOut);
-
-    init();
-    draw();
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseout', handleMouseOut);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
+function Hero3D() {
+  const meshRef = useRef();
+  useFrame((state) => {
+    meshRef.current.rotation.x = state.clock.elapsedTime * 0.2;
+    meshRef.current.rotation.y = state.clock.elapsedTime * 0.3;
+  });
 
   return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        zIndex: -1,
-        pointerEvents: 'none'
-      }}
-    />
+    <>
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[10, 10, 5]} intensity={1.5} color="#00d4ff" />
+      <directionalLight position={[-10, -10, -5]} intensity={1} color="#c084fc" />
+      <Float speed={2} rotationIntensity={0.8} floatIntensity={1.5}>
+        <group ref={meshRef}>
+          <mesh>
+            <boxGeometry args={[3, 3, 3]} />
+            <meshStandardMaterial color="#0a0e1c" wireframe transparent opacity={0.4} />
+          </mesh>
+          <mesh>
+            <icosahedronGeometry args={[1.8, 1]} />
+            <meshStandardMaterial color="#00d4ff" wireframe />
+          </mesh>
+          <mesh>
+            <octahedronGeometry args={[0.9, 0]} />
+            <meshStandardMaterial color="#c084fc" emissive="#c084fc" emissiveIntensity={2} />
+          </mesh>
+        </group>
+      </Float>
+    </>
   );
-};
+}
 
-// Terminal typing effect hook
-const useTypewriter = (text, speed = 50) => {
-  const [displayedText, setDisplayedText] = useState('');
+function About3D() {
+  const points = useMemo(() => {
+    const pts = [];
+    for (let i = 0; i < 400; i++) {
+      const u = Math.random();
+      const v = Math.random();
+      const theta = u * 2.0 * Math.PI;
+      const phi = Math.acos(2.0 * v - 1.0);
+      const r = 2.0 + Math.random() * 0.5;
+      const x = r * Math.sin(phi) * Math.cos(theta);
+      const y = r * Math.sin(phi) * Math.sin(theta) * 0.8;
+      const z = r * Math.cos(phi);
+      pts.push(new THREE.Vector3(x, y, z));
+    }
+    return new THREE.BufferGeometry().setFromPoints(pts);
+  }, []);
 
-  useEffect(() => {
-    let i = 0;
-    const typingInterval = setInterval(() => {
-      if (i < text.length) {
-        setDisplayedText((prev) => prev + text.charAt(i));
-        i++;
-      } else {
-        clearInterval(typingInterval);
+  const ref = useRef();
+  useFrame((state) => {
+    if (ref.current) {
+      ref.current.rotation.y = state.clock.elapsedTime * 0.15;
+      ref.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
+    }
+  });
+
+  return (
+    <>
+      <ambientLight intensity={0.8} />
+      <group ref={ref}>
+        <points geometry={points}>
+          <pointsMaterial size={0.06} color="#c084fc" transparent opacity={0.6} />
+        </points>
+      </group>
+    </>
+  );
+}
+
+function Experience3D() {
+  const lineRef = useRef();
+
+  const points = useMemo(() => {
+    const pts = [];
+    for (let i = 0; i < 100; i++) {
+      pts.push(new THREE.Vector3((i - 50) * 0.1, 0, 0));
+    }
+    return new THREE.BufferGeometry().setFromPoints(pts);
+  }, []);
+
+  useFrame((state) => {
+    if (!lineRef.current) return;
+    const positions = lineRef.current.geometry.attributes.position;
+    for (let i = 0; i < positions.count; i++) {
+      const x = positions.getX(i);
+      const y = Math.sin(x * 1.5 + state.clock.elapsedTime * 2) * 0.8 + 
+                Math.sin(x * 4 + state.clock.elapsedTime * 1.5) * 0.3;
+      positions.setY(i, y);
+    }
+    positions.needsUpdate = true;
+  });
+
+  return (
+    <Float speed={1.5} floatIntensity={0.5}>
+      <line ref={lineRef} geometry={points}>
+        <lineBasicMaterial color="#34d399" linewidth={2} transparent opacity={0.6} />
+      </line>
+    </Float>
+  );
+}
+
+function Projects3D() {
+  const pointsRef = useRef();
+  const points = useMemo(() => {
+    const pts = [];
+    for (let i = 0; i < 200; i++) {
+      pts.push(
+        new THREE.Vector3(
+          (Math.random() - 0.5) * 12,
+          (Math.random() - 0.5) * 12,
+          (Math.random() - 0.5) * 6
+        )
+      );
+    }
+    return new THREE.BufferGeometry().setFromPoints(pts);
+  }, []);
+
+  useFrame((state) => {
+    if (pointsRef.current) {
+      pointsRef.current.rotation.y = state.clock.elapsedTime * 0.05;
+      pointsRef.current.rotation.x = state.clock.elapsedTime * 0.03;
+    }
+  });
+
+  return (
+    <points ref={pointsRef} geometry={points}>
+      <pointsMaterial size={0.08} color="#00d4ff" transparent opacity={0.4} />
+    </points>
+  );
+}
+
+function Skills3D() {
+  const group = useRef();
+  const nodes = useMemo(() => {
+    return Array.from({ length: 25 }, () => 
+      new THREE.Vector3((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 4)
+    );
+  }, []);
+
+  const connections = useMemo(() => {
+    const pts = [];
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        if (nodes[i].distanceTo(nodes[j]) < 3.5) {
+          pts.push(nodes[i], nodes[j]);
+        }
       }
-    }, speed);
-    return () => clearInterval(typingInterval);
-  }, [text, speed]);
+    }
+    return new THREE.BufferGeometry().setFromPoints(pts);
+  }, [nodes]);
 
-  return displayedText;
-};
+  useFrame((state) => {
+    if (group.current) {
+      group.current.rotation.y = state.clock.elapsedTime * 0.08;
+    }
+  });
 
-// Custom interactive hovering for UI components
-const InteractiveCard = ({ children, className = '', style = {} }) => {
+  return (
+    <group ref={group}>
+      <ambientLight intensity={1} />
+      {nodes.map((pos, i) => (
+        <mesh key={i} position={pos}>
+          <sphereGeometry args={[0.08, 16, 16]} />
+          <meshBasicMaterial color="#00d4ff" />
+        </mesh>
+      ))}
+      <lineSegments geometry={connections}>
+        <lineBasicMaterial color="#00d4ff" transparent opacity={0.15} />
+      </lineSegments>
+    </group>
+  );
+}
+
+// ═══════════════════════════════════════════════
+// 3D CARD COMPONENT
+// ═══════════════════════════════════════════════
+
+function Card3D({ children, className = '', style = {}, variant = 'default' }) {
   const cardRef = useRef(null);
+  const [transform, setTransform] = useState('');
+  const [isHovered, setIsHovered] = useState(false);
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = useCallback((e) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    // Track mouse position for all variants
     cardRef.current.style.setProperty('--mouse-x', `${x}px`);
     cardRef.current.style.setProperty('--mouse-y', `${y}px`);
-  };
+    const pctX = ((x / rect.width) * 100).toFixed(1);
+    const pctY = ((y / rect.height) * 100).toFixed(1);
+    cardRef.current.style.setProperty('--mouse-pct-x', `${pctX}%`);
+    cardRef.current.style.setProperty('--mouse-pct-y', `${pctY}%`);
+
+    // ─── ABOUT: Glow-follow only, NO tilt ───
+    if (variant === 'about') {
+      setTransform('scale3d(1, 1, 1)');
+      return;
+    }
+
+    // ─── EXPERIENCE: Glitch micro-shift ───
+    if (variant === 'experience') {
+      const shiftX = ((x - centerX) / centerX) * 3;
+      const shiftY = ((y - centerY) / centerY) * 2;
+      setTransform(`translate(${shiftX}px, ${shiftY}px)`);
+      return;
+    }
+
+    // ─── EDUCATION: Float / levitate upward ───
+    if (variant === 'education') {
+      setTransform('translateY(-8px) scale(1.02)');
+      return;
+    }
+
+    // ─── PROJECTS: Deep 3D perspective tilt (the only one that tilts!) ───
+    if (variant === 'projects') {
+      const rotateX = ((y - centerY) / centerY) * -12;
+      const rotateY = ((x - centerX) / centerX) * 12;
+      setTransform(`perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.04, 1.04, 1.04)`);
+      const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+      cardRef.current.style.setProperty('--shimmer-angle', `${angle + 90}deg`);
+      return;
+    }
+
+    // ─── LANGUAGES: Scan-line sweep (position drives the scan line via CSS) ───
+    if (variant === 'languages') {
+      setTransform('scale(1.01)');
+      return;
+    }
+
+    // ─── DEFAULT: Standard subtle tilt ───
+    const rotateX = ((y - centerY) / centerY) * -8;
+    const rotateY = ((x - centerX) / centerX) * 8;
+    setTransform(`perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`);
+    const angle = Math.atan2(y - centerY, x - centerX) * (180 / Math.PI);
+    cardRef.current.style.setProperty('--shimmer-angle', `${angle + 90}deg`);
+  }, [variant]);
+
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false);
+    setTransform('');
+    if (cardRef.current) {
+      cardRef.current.style.removeProperty('--mouse-x');
+      cardRef.current.style.removeProperty('--mouse-y');
+    }
+  }, []);
+
+  // Build transition based on variant
+  let transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease';
+  if (variant === 'experience') {
+    transition = 'transform 0.05s linear, box-shadow 0.2s ease'; // snappy glitch
+  } else if (variant === 'education') {
+    transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease'; // bouncy float
+  } else if (variant === 'projects' && transform) {
+    transition = 'transform 0.08s ease-out, box-shadow 0.4s ease'; // responsive tilt
+  }
 
   return (
-    <div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      className={`glass-card interactive-node ${className}`}
-      style={style}
-    >
-      {children}
+    <div className={`card-3d-wrapper wrapper-${variant}`}>
+      <div
+        ref={cardRef}
+        className={`card-3d variant-${variant} ${isHovered ? 'is-hovered' : ''} ${className}`}
+        style={{
+          ...style,
+          transform: transform || undefined,
+          transition,
+        }}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {children}
+      </div>
     </div>
   );
-};
+}
+
+// ═══════════════════════════════════════════════
+// SCROLL REVEAL 3D
+// ═══════════════════════════════════════════════
+
+function ScrollReveal3D({ children, delay = 0, className = '' }) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-50px' });
+
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      initial={{ opacity: 0, y: 60, rotateX: 5 }}
+      animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
+      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
+      style={{ perspective: '1200px' }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// ═══════════════════════════════════════════════
+// TYPEWRITER HOOK
+// ═══════════════════════════════════════════════
+
+function useTypewriter(text, speed = 40) {
+  const [displayedText, setDisplayedText] = useState('');
+
+  useEffect(() => {
+    let index = 0;
+    setDisplayedText('');
+    const interval = setInterval(() => {
+      index++;
+      setDisplayedText(text.slice(0, index));
+      if (index >= text.length) {
+        clearInterval(interval);
+      }
+    }, speed);
+    return () => clearInterval(interval);
+  }, [text, speed]);
+
+  return displayedText;
+}
+
+// ═══════════════════════════════════════════════
+// SKILLS GRID — Bold & Visible
+// ═══════════════════════════════════════════════
+
+const SKILL_CATEGORIES = [
+  {
+    title: 'ML & Deep Learning',
+    icon: 'fas fa-brain',
+    skills: [
+      { name: 'PyTorch', icon: 'fas fa-brain' },
+      { name: 'Transformers', icon: 'fas fa-network-wired', purple: true },
+      { name: 'Scikit-learn', icon: 'fas fa-chart-line' },
+      { name: 'TensorFlow', icon: 'fas fa-microchip', purple: true },
+      { name: 'Time Series', icon: 'fas fa-clock' },
+      { name: 'Computer Vision', icon: 'fas fa-eye', purple: true },
+    ],
+  },
+  {
+    title: 'Data & Analysis',
+    icon: 'fas fa-database',
+    purple: true,
+    skills: [
+      { name: 'Pandas', icon: 'fas fa-table', purple: true },
+      { name: 'NumPy', icon: 'fas fa-square-root-alt' },
+      { name: 'LLMs', icon: 'fas fa-comments', purple: true },
+      { name: 'AutoML', icon: 'fas fa-robot' },
+    ],
+  },
+  {
+    title: 'Engineering & MLOps',
+    icon: 'fas fa-server',
+    skills: [
+      { name: 'Python', icon: 'fab fa-python', purple: true },
+      { name: 'Docker', icon: 'fab fa-docker' },
+      { name: 'FastAPI', icon: 'fas fa-bolt' },
+      { name: 'SQL', icon: 'fas fa-database', purple: true },
+      { name: 'Git', icon: 'fab fa-git-alt' },
+      { name: 'MLOps', icon: 'fas fa-server' },
+      { name: 'Flask', icon: 'fas fa-pepper-hot', purple: true },
+    ],
+  },
+];
+
+function SkillsGrid() {
+  return (
+    <div>
+      {SKILL_CATEGORIES.map((cat, catIdx) => (
+        <ScrollReveal3D key={cat.title} delay={0.1 * catIdx}>
+          <div className="skill-category">
+            <div className={`skill-category-title ${cat.purple ? 'purple-cat' : ''}`}>
+              <i className={cat.icon}></i>
+              {cat.title}
+            </div>
+            <div className="skills-grid">
+              {cat.skills.map((skill) => (
+                <div key={skill.name} className={`skill-tile ${skill.purple ? 'purple' : ''}`}>
+                  <i className={`${skill.icon} skill-icon`}></i>
+                  <span className="skill-name">{skill.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </ScrollReveal3D>
+      ))}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════
+// MAIN APP
+// ═══════════════════════════════════════════════
 
 function App() {
   const [navActive, setNavActive] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const mainRef = useRef();
 
   const heroCodeText = `> INITIALIZING NEURAL NETWORK PROTOCOL...
-> ESTABLISHING REAL-TIME CONNECTION [██████████] 100%
-> USER: Yashkumar Dhameliya
-> ROLE: Machine Learning & Data Analyst
-> STATUS: ONLINE & INTERACTIVE
+> MODEL: Yashkumar_Dhameliya_v2.0
+> ROLE: ML Engineer & Data Scientist
+> STATUS: ONLINE ■■■■■■■■■■ 100%
 
-def introduce_network():
-    nodes = ["Time Series Analysis", "MLOps", "Computer Vision"]
-    return f"Processing raw data streams into production AI via {nodes}"
-`;
+def forward_pass(data):
+    features = extract(data)
+    prediction = model.predict(features)
+    return deploy(prediction)
 
-  const typedHero = useTypewriter(heroCodeText, 30);
+# MODELS LOADED: Time Series | CV | AutoML | LLMs
+# PIPELINE: Active & Processing...`;
+
+  const typedHero = useTypewriter(heroCodeText, 25);
 
   useEffect(() => {
-    const revealElements = document.querySelectorAll('.reveal');
-    const revealOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
-
-    const revealObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('active');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, revealOptions);
-
-    revealElements.forEach(el => revealObserver.observe(el));
-    return () => revealObserver.disconnect();
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const toggleNav = () => setNavActive(!navActive);
   const closeNav = () => setNavActive(false);
 
   return (
-    <>
-      {/* Real-time Interactive Neural Network Canvas */}
-      <NeuralNetworkCanvas />
-
-      <div className="mesh-bg">
-        {/* Keeping subtle background glows */}
-        <div className="mesh-blob blob-1"></div>
-        <div className="mesh-blob blob-2" style={{ opacity: 0.15 }}></div>
-      </div>
+    <div ref={mainRef} className="app-wrapper">
+      {/* Global Canvas for Porting Views */}
+      <Canvas eventSource={mainRef} className="global-canvas">
+        <View.Port />
+      </Canvas>
+      
       <div className="grid-overlay"></div>
 
-      <nav className="navbar">
-        <div className="nav-container">
-          <a href="#" className="logo">YD<span className="dot">_</span></a>
-          <ul className={`nav-links ${navActive ? 'active' : ''}`}>
-            <li><a href="#hero" onClick={closeNav}>Init_Node</a></li>
-            <li><a href="#about" onClick={closeNav}>Layer_1_Summary</a></li>
-            <li><a href="#experience" onClick={closeNav}>Training_Logs</a></li>
-            <li><a href="#education" onClick={closeNav}>Knowledge_Base</a></li>
-            <li><a href="#projects" onClick={closeNav}>Deployed_Models</a></li>
-            <li><a href="#skills" onClick={closeNav}>Tensor_Stack</a></li>
-            <li><a href="#languages" onClick={closeNav}>Lang_Protocols</a></li>
-          </ul>
-          <div className="hamburger" onClick={toggleNav}>
-            {navActive ? <i className="fas fa-times"></i> : <i className="fas fa-diagram-project"></i>}
-          </div>
-        </div>
-      </nav>
-
-      <main>
-        {/* Terminal Hero Section */}
-        <section id="hero" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', paddingTop: '5rem' }}>
-          <div className="container">
-            <div className="hero-content reveal active" style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'left' }}>
-              <InteractiveCard className="terminal-window" style={{ padding: '0', overflow: 'hidden', border: '1px solid var(--color-primary)' }}>
-                <div className="terminal-header" style={{ background: 'var(--bg-surface-high)', padding: '0.8rem 1rem', display: 'flex', gap: '8px', borderBottom: '1px solid var(--glass-border)' }}>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ff5f56' }}></div>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ffbd2e' }}></div>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#27c93f' }}></div>
-                  <span style={{ marginLeft: '1rem', color: 'var(--text-muted)', fontSize: '0.9rem', fontFamily: 'monospace' }}>yash_neural_net.py (Interactive)</span>
-                </div>
-                <div className="terminal-body" style={{ padding: '2rem', fontFamily: 'monospace', fontSize: '1.1rem', color: '#b8ffe9', background: 'rgba(0,0,0,0.6)', minHeight: '300px', whiteSpace: 'pre-wrap' }}>
-                  {typedHero}<span className="cursor-blink">_</span>
-                </div>
-              </InteractiveCard>
-
-              <div className="action-buttons" style={{ marginTop: '3rem', justifyContent: 'flex-start' }}>
-                <a href="#projects" className="btn btn-primary" style={{ transform: 'translateZ(20px)' }}>
-                  <i className="fas fa-play"></i> Initialize Nodes
-                </a>
-                <a href="https://github.com/Yashd1722" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
-                  <i className="fab fa-github"></i> Repository
-                </a>
-                <a href="https://www.linkedin.com/in/yashkumar-dhameliya" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
-                  <i className="fab fa-linkedin-in"></i> Network Ext. (LinkedIn)
-                </a>
-              </div>
+      {/* Main Content */}
+      <div className="app-content">
+        {/* Navigation */}
+        <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+          <div className="nav-container">
+            <a href="#" className="logo">YD<span className="dot">_</span></a>
+            <ul className={`nav-links ${navActive ? 'active' : ''}`}>
+              <li><a href="#hero" onClick={closeNav}>model.init()</a></li>
+              <li><a href="#about" onClick={closeNav}>model.summary()</a></li>
+              <li><a href="#experience" onClick={closeNav}>model.fit()</a></li>
+              <li><a href="#education" onClick={closeNav}>model.load_weights()</a></li>
+              <li><a href="#projects" onClick={closeNav}>model.deploy()</a></li>
+              <li><a href="#skills" onClick={closeNav}>model.compile()</a></li>
+              <li><a href="#languages" onClick={closeNav}>nlp.tokenize()</a></li>
+            </ul>
+            <div className="hamburger" onClick={toggleNav}>
+              {navActive ? <i className="fas fa-times"></i> : <i className="fas fa-bars"></i>}
             </div>
           </div>
-        </section>
+        </nav>
 
-        {/* About / Architecture */}
-        <section id="about">
-          <div className="container reveal">
-            <h2 className="section-title">Network Architecture (Zusammenfassung)</h2>
-            <InteractiveCard style={{ display: 'grid', gridTemplateColumns: 'minmax(250px, 1fr) 2fr', gap: '3rem', alignItems: 'center' }}>
-              <div style={{ textAlign: 'center' }}>
-                <div style={{ position: 'relative', display: 'inline-block' }}>
-                  <i className="fas fa-brain" style={{ fontSize: '7rem', color: 'var(--color-primary)', filter: 'drop-shadow(0 0 30px rgba(0,210,255,0.6))', animation: 'pulseFloat 4s infinite' }}></i>
-                </div>
-              </div>
-              <div>
-                <p style={{ fontSize: '1.2rem', marginBottom: '2rem', color: 'var(--text-main)' }}>
-                  Machine Learning & Data Analytics-Spezialist. Focusing on data-driven AI solutions, Feature Engineering, Time Series Analysis, and Computer Vision. Hands-on experience with LLM analysis, AutoML development, and interactive ML implementations.
-                </p>
-                <div style={{ display: 'flex', gap: '2rem', borderTop: '1px solid var(--glass-border)', paddingTop: '2rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', color: 'var(--text-muted)', fontSize: '1.1rem' }}>
-                    <i className="fas fa-satellite-dish" style={{ color: 'var(--color-primary)' }}></i> Würzburg, DE (Origin Node)
+        <main>
+          {/* ════════════ HERO SECTION ════════════ */}
+          <section id="hero">
+            <View className="view-container">
+              <Hero3D />
+            </View>
+            <div className="container">
+              <ScrollReveal3D>
+                <div className="hero-content">
+                  <div className="hero-tag">
+                    <div className="pulse-dot"></div>
+                    Neural Network Online
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', color: 'var(--text-muted)', fontSize: '1.1rem' }}>
-                    <i className="fas fa-satellite" style={{ color: 'var(--color-primary)' }}></i> yashdhameliya03@gmail.com
+
+                  <h1 className="hero-name">
+                    Yashkumar<br />
+                    <span className="gradient-text">Dhameliya</span>
+                  </h1>
+
+                  <p className="hero-title">Machine Learning Engineer & Data Scientist</p>
+
+                  <Card3D className="terminal-window" style={{ padding: 0 }}>
+                    <div className="terminal-header">
+                      <div className="terminal-dot red"></div>
+                      <div className="terminal-dot yellow"></div>
+                      <div className="terminal-dot green"></div>
+                      <span className="terminal-title">yash_neural_net.py</span>
+                    </div>
+                    <div className="terminal-body">
+                      {typedHero}<span className="cursor-blink"></span>
+                    </div>
+                  </Card3D>
+
+                  <div className="action-buttons">
+                    <a href="#projects" className="btn btn-primary">
+                      <i className="fas fa-play"></i> View Projects
+                    </a>
+                    <a href="https://github.com/Yashd1722" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                      <i className="fab fa-github"></i> GitHub
+                    </a>
+                    <a href="https://www.linkedin.com/in/yashkumar-dhameliya" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                      <i className="fab fa-linkedin-in"></i> LinkedIn
+                    </a>
                   </div>
                 </div>
-              </div>
-            </InteractiveCard>
-          </div>
-        </section>
-
-        {/* Experience Timeline */}
-        <section id="experience">
-          <div className="container reveal">
-            <h2 className="section-title">Training Loops (Berufserfahrung)</h2>
-            <div className="timeline">
-              <div className="timeline-item">
-                <div className="timeline-dot"></div>
-                <InteractiveCard className="timeline-content">
-                  <span className="date">Epoch 08/2025 to 01/2026</span>
-                  <h3>Machine Learning Engineer</h3>
-                  <h4><a href="https://www.axinity.dev/en/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', textDecoration: 'none' }}>axinity.dev</a></h4>
-                  <ul>
-                    <li>Dynamic data analysis, cleaning and feature extraction for E-commerce ML models.</li>
-                    <li>Real-time processing of business-relevant AI workflows.</li>
-                  </ul>
-                </InteractiveCard>
-              </div>
-              <div className="timeline-item">
-                <div className="timeline-dot"></div>
-                <InteractiveCard className="timeline-content">
-                  <span className="date">Epoch Present</span>
-                  <h3>Masterarbeit Researcher</h3>
-                  <h4>Time Series & Synthetic Data Generation</h4>
-                  <ul>
-                    <li>Developed multi-class time series classification models with synthetic climate data streams.</li>
-                    <li>Systematic testing of neural architectures.</li>
-                  </ul>
-                </InteractiveCard>
-              </div>
+              </ScrollReveal3D>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Education Section */}
-        <section id="education">
-          <div className="container reveal">
-            <h2 className="section-title">Knowledge Base (Ausbildung)</h2>
-            <div className="grid-2">
-              <InteractiveCard className="edu-card">
-                <div style={{ fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: '1.2rem' }}><i className="fas fa-university"></i></div>
-                <span className="date">Epoch 03/2023 – Present</span>
-                <h3>Master of Science in Informatik</h3>
-                <h4>Julius-Maximilians-Universität Würzburg</h4>
-              </InteractiveCard>
-              <InteractiveCard className="edu-card">
-                <div style={{ fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: '1.2rem' }}><i className="fas fa-graduation-cap"></i></div>
-                <span className="date">Epoch 06/2018 – 05/2022</span>
-                <h3>Bachelor of Computer Science & Engineering</h3>
-                <h4>Marwadi University</h4>
-                <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem' }}>Notendurchschnitt: 1,9 (deutsche Äquivalenz) | CGPA: 8.17/10</p>
-              </InteractiveCard>
-            </div>
-          </div>
-        </section>
+          <div className="section-divider"></div>
 
-        {/* Model Cards (Projects) */}
-        <section id="projects">
-          <div className="container reveal">
-            <h2 className="section-title">Inference Nodes (Projekte)</h2>
-            <div className="grid-2">
-              <InteractiveCard className="project-card">
-                <div className="project-header">
-                  <h3>NN-GPT: AutoML with LLMs</h3>
-                  <span className="badge">v2024.1</span>
-                </div>
-                <p className="subtitle">Architecture: LLM & AutoML</p>
-                <ul style={{ color: 'var(--text-muted)' }}>
-                  <li>Interactive LLM-supported forecasting of model accuracy based on early training states.</li>
-                  <li>Scientific publication documenting dynamic metrics.</li>
-                </ul>
-                <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
-                  <a href="https://www.researchgate.net/publication/397983532_NNGPT_Rethinking_AutoML_with_Large_Language_Models" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
-                    <i className="fas fa-link"></i> Access Node
-                  </a>
-                  <a href="https://github.com/Yashd1722/nn-gpt" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
-                    <i className="fab fa-github"></i> GitHub
-                  </a>
-                </div>
-              </InteractiveCard>
+          {/* ════════════ ABOUT SECTION ════════════ */}
+          <section id="about">
+            <View className="view-container">
+              <About3D />
+            </View>
+            <div className="container">
+              <ScrollReveal3D>
+                <h2 className="section-title">model.summary()</h2>
+                <p className="section-subtitle"># Network Architecture</p>
+              </ScrollReveal3D>
 
-              <InteractiveCard className="project-card">
-                <div className="project-header">
-                  <h3>LEMUR Neural Network</h3>
-                  <span className="badge">v2024.0</span>
-                </div>
-                <p className="subtitle">Architecture: PyTorch, Optuna</p>
-                <ul style={{ color: 'var(--text-muted)' }}>
-                  <li>PyTorch-based AutoML framework designed for real-time validation.</li>
-                  <li>Published methodology with interactive open-access data logs.</li>
-                </ul>
-                <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
-                  <a href="https://arxiv.org/abs/2504.10552" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
-                    <i className="fas fa-folder-open"></i> Query Data
-                  </a>
-                  <a href="https://github.com/Yashd1722/nn-dataset" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
-                    <i className="fab fa-github"></i> GitHub
-                  </a>
-                </div>
-              </InteractiveCard>
+              <ScrollReveal3D delay={0.15}>
+                <Card3D variant="about">
+                  <div className="about-grid">
+                    <div className="about-visual">
+                      <div className="brain-3d-container">
+                        <i className="fas fa-brain"></i>
+                        <div className="brain-ring"></div>
+                        <div className="brain-ring"></div>
+                      </div>
+                      <div className="about-stats">
+                        <div className="stat-item">
+                          <div className="stat-value">4+</div>
+                          <div className="stat-label">Projects</div>
+                        </div>
+                        <div className="stat-item">
+                          <div className="stat-value">2</div>
+                          <div className="stat-label">Publications</div>
+                        </div>
+                        <div className="stat-item">
+                          <div className="stat-value">M.Sc</div>
+                          <div className="stat-label">Informatik</div>
+                        </div>
+                        <div className="stat-item">
+                          <div className="stat-value">DE</div>
+                          <div className="stat-label">Location</div>
+                        </div>
+                      </div>
+                    </div>
 
-              <InteractiveCard className="project-card">
-                <div className="project-header">
-                  <h3>INSTRUCT-IR</h3>
-                  <span className="badge">v2023.2</span>
-                </div>
-                <p className="subtitle">Architecture: Vision-Language Models</p>
-                <ul style={{ color: 'var(--text-muted)' }}>
-                  <li>Investigated model generalization under dynamic image conditions.</li>
-                  <li>Active stress-testing of visual modalities.</li>
-                </ul>
-                <a href="https://github.com/Yashd1722/instruct-" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
-                  <i className="fab fa-github"></i> GitHub
-                </a>
-              </InteractiveCard>
-
-              <InteractiveCard className="project-card">
-                <div className="project-header">
-                  <h3>Gender Classification</h3>
-                  <span className="badge">v2022.9</span>
-                </div>
-                <p className="subtitle">Architecture: OpenCV Stream</p>
-                <ul style={{ color: 'var(--text-muted)' }}>
-                  <li>Real-time capable computer vision recognition algorithm.</li>
-                  <li>Continuous preprocessing stream with data augmentation hooks.</li>
-                </ul>
-              </InteractiveCard>
-            </div>
-          </div>
-        </section>
-
-        {/* Tech Stacks */}
-        <section id="skills">
-          <div className="container reveal">
-            <h2 className="section-title">Neural Parameters & Tooling</h2>
-
-            <div className="marquee-container">
-              <div className="marquee-content">
-                {[...Array(2)].map((_, idx) => (
-                  <React.Fragment key={idx}>
-                    <div className="marquee-tag interactive-node"><i className="fas fa-brain"></i> PyTorch</div>
-                    <div className="marquee-tag purple interactive-node"><i className="fas fa-network-wired"></i> Transformers</div>
-                    <div className="marquee-tag interactive-node"><i className="fas fa-chart-line"></i> Scikit-learn</div>
-                    <div className="marquee-tag purple interactive-node"><i className="fas fa-table"></i> Pandas</div>
-                    <div className="marquee-tag interactive-node"><i className="fas fa-square-root-alt"></i> NumPy</div>
-                    <div className="marquee-tag purple interactive-node"><i className="fas fa-diagram-project"></i> Real-time Features</div>
-                    <div className="marquee-tag interactive-node"><i className="fas fa-clock"></i> Time Series</div>
-                    <div className="marquee-tag purple interactive-node"><i className="fas fa-microchip"></i> Interactive LLMs</div>
-                  </React.Fragment>
-                ))}
-              </div>
-            </div>
-
-            <div className="marquee-container">
-              <div className="marquee-content reverse">
-                {[...Array(2)].map((_, idx) => (
-                  <React.Fragment key={idx}>
-                    <div className="marquee-tag purple interactive-node"><i className="fab fa-python"></i> Python</div>
-                    <div className="marquee-tag interactive-node"><i className="fas fa-server"></i> MLOps</div>
-                    <div className="marquee-tag purple interactive-node"><i className="fas fa-pepper-hot"></i> Flask</div>
-                    <div className="marquee-tag interactive-node"><i className="fas fa-bolt"></i> FastAPI (Live Streams)</div>
-                    <div className="marquee-tag purple interactive-node"><i className="fas fa-database"></i> SQL</div>
-                    <div className="marquee-tag interactive-node"><i className="fab fa-docker"></i> Docker</div>
-                    <div className="marquee-tag purple interactive-node"><i className="fab fa-git-alt"></i> Git</div>
-                  </React.Fragment>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Sprachen (Languages) */}
-        <section id="languages">
-          <div className="container reveal">
-            <h2 className="section-title">Language Protocols (Sprachen)</h2>
-            <div className="grid-2">
-              <InteractiveCard className="edu-card">
-                <div style={{ fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: '1.2rem' }}><i className="fas fa-language"></i></div>
-                <h3>English</h3>
-                <h4 style={{ color: 'var(--color-secondary)' }}>B2 – Upper Intermediate</h4>
-                <div style={{ marginTop: '1rem' }}>
-                  <div style={{ background: 'var(--bg-surface-high)', borderRadius: '8px', height: '8px', overflow: 'hidden' }}>
-                    <div style={{ width: '75%', height: '100%', background: 'linear-gradient(90deg, var(--color-primary), var(--color-secondary))', borderRadius: '8px' }}></div>
+                    <div className="about-text">
+                      <p>
+                        Machine Learning & Data Analytics-Spezialist. Focusing on data-driven AI solutions, Feature Engineering, Time Series Analysis, and Computer Vision. Hands-on experience with LLM analysis, AutoML development, and interactive ML implementations.
+                      </p>
+                      <div className="about-details">
+                        <div className="about-detail-item">
+                          <i className="fas fa-map-marker-alt"></i>
+                          Würzburg, Germany
+                        </div>
+                        <div className="about-detail-item">
+                          <i className="fas fa-envelope"></i>
+                          yashdhameliya03@gmail.com
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </InteractiveCard>
-              <InteractiveCard className="edu-card">
-                <div style={{ fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: '1.2rem' }}><i className="fas fa-language"></i></div>
-                <h3>Deutsch</h3>
-                <h4 style={{ color: 'var(--color-secondary)' }}>A2 – Elementary</h4>
-                <div style={{ marginTop: '1rem' }}>
-                  <div style={{ background: 'var(--bg-surface-high)', borderRadius: '8px', height: '8px', overflow: 'hidden' }}>
-                    <div style={{ width: '35%', height: '100%', background: 'linear-gradient(90deg, var(--color-primary), var(--color-secondary))', borderRadius: '8px' }}></div>
+                </Card3D>
+              </ScrollReveal3D>
+            </div>
+          </section>
+
+          <div className="section-divider"></div>
+
+          {/* ════════════ EXPERIENCE SECTION ════════════ */}
+          <section id="experience">
+            <View className="view-container">
+              <Experience3D />
+            </View>
+            <div className="container">
+              <ScrollReveal3D>
+                <h2 className="section-title">model.fit()</h2>
+                <p className="section-subtitle"># Training Loops</p>
+              </ScrollReveal3D>
+
+              <div className="timeline">
+                <div className="timeline-beam"></div>
+
+                <ScrollReveal3D delay={0.1}>
+                  <div className="timeline-item">
+                    <div className="timeline-dot"></div>
+                    <Card3D variant="experience" className="timeline-content">
+                      <span className="date">08/2025 → 01/2026</span>
+                      <h3>Machine Learning Engineer</h3>
+                      <h4>
+                        <a href="https://www.axinity.dev/en/" target="_blank" rel="noopener noreferrer">
+                          axinity.dev
+                        </a>
+                      </h4>
+                      <ul className="content-list">
+                        <li>Dynamic data analysis, cleaning and feature extraction for E-commerce ML models.</li>
+                        <li>Real-time processing of business-relevant AI workflows.</li>
+                      </ul>
+                    </Card3D>
                   </div>
-                </div>
-              </InteractiveCard>
+                </ScrollReveal3D>
+
+                <ScrollReveal3D delay={0.2}>
+                  <div className="timeline-item">
+                    <div className="timeline-dot"></div>
+                    <Card3D variant="experience" className="timeline-content">
+                      <span className="date">Present</span>
+                      <h3>Masterarbeit Researcher</h3>
+                      <h4>Time Series & Synthetic Data Generation</h4>
+                      <ul className="content-list">
+                        <li>Developed multi-class time series classification models with synthetic climate data streams.</li>
+                        <li>Systematic testing of neural architectures.</li>
+                      </ul>
+                    </Card3D>
+                  </div>
+                </ScrollReveal3D>
+              </div>
+            </div>
+          </section>
+
+          <div className="section-divider"></div>
+
+          {/* ════════════ EDUCATION SECTION ════════════ */}
+          <section id="education">
+            <div className="container">
+              <ScrollReveal3D>
+                <h2 className="section-title">model.load_weights()</h2>
+                <p className="section-subtitle"># Knowledge Base</p>
+              </ScrollReveal3D>
+
+              <div className="grid-2">
+                <ScrollReveal3D delay={0.1}>
+                  <Card3D variant="education" className="edu-card">
+                    <i className="fas fa-university edu-icon"></i>
+                    <span className="date">03/2023 – Present</span>
+                    <h3>Master of Science in Informatik</h3>
+                    <h4>Julius-Maximilians-Universität Würzburg</h4>
+                  </Card3D>
+                </ScrollReveal3D>
+
+                <ScrollReveal3D delay={0.2}>
+                  <Card3D variant="education" className="edu-card">
+                    <i className="fas fa-graduation-cap edu-icon"></i>
+                    <span className="date">06/2018 – 05/2022</span>
+                    <h3>Bachelor of CS & Engineering</h3>
+                    <h4>Marwadi University</h4>
+                    <p className="gpa">CGPA: 8.17/10 (≈ 1.9 DE)</p>
+                  </Card3D>
+                </ScrollReveal3D>
+              </div>
+            </div>
+          </section>
+
+          <div className="section-divider"></div>
+
+          {/* ════════════ PROJECTS SECTION ════════════ */}
+          <section id="projects">
+            <View className="view-container">
+              <Projects3D />
+            </View>
+            <div className="container">
+              <ScrollReveal3D>
+                <h2 className="section-title">model.deploy()</h2>
+                <p className="section-subtitle"># Deployed Models</p>
+              </ScrollReveal3D>
+
+              <div className="grid-2">
+                <ScrollReveal3D delay={0.1}>
+                  <Card3D variant="projects" className="project-card">
+                    <div className="project-header">
+                      <h3>NN-GPT: AutoML with LLMs</h3>
+                      <span className="badge">v2024.1</span>
+                    </div>
+                    <p className="subtitle">Architecture: LLM & AutoML</p>
+                    <ul className="content-list">
+                      <li>Interactive LLM-supported forecasting of model accuracy based on early training states.</li>
+                      <li>Scientific publication documenting dynamic metrics.</li>
+                    </ul>
+                    <div className="project-links">
+                      <a href="https://www.researchgate.net/publication/397983532_NNGPT_Rethinking_AutoML_with_Large_Language_Models" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                        <i className="fas fa-link"></i> Paper
+                      </a>
+                      <a href="https://github.com/Yashd1722/nn-gpt" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                        <i className="fab fa-github"></i> Code
+                      </a>
+                    </div>
+                  </Card3D>
+                </ScrollReveal3D>
+
+                <ScrollReveal3D delay={0.2}>
+                  <Card3D variant="projects" className="project-card">
+                    <div className="project-header">
+                      <h3>LEMUR Neural Network</h3>
+                      <span className="badge">v2024.0</span>
+                    </div>
+                    <p className="subtitle">Architecture: PyTorch, Optuna</p>
+                    <ul className="content-list">
+                      <li>PyTorch-based AutoML framework designed for real-time validation.</li>
+                      <li>Published methodology with interactive open-access data logs.</li>
+                    </ul>
+                    <div className="project-links">
+                      <a href="https://arxiv.org/abs/2504.10552" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                        <i className="fas fa-folder-open"></i> arXiv
+                      </a>
+                      <a href="https://github.com/Yashd1722/nn-dataset" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                        <i className="fab fa-github"></i> Code
+                      </a>
+                    </div>
+                  </Card3D>
+                </ScrollReveal3D>
+
+                <ScrollReveal3D delay={0.3}>
+                  <Card3D variant="projects" className="project-card">
+                    <div className="project-header">
+                      <h3>INSTRUCT-IR</h3>
+                      <span className="badge">v2023.2</span>
+                    </div>
+                    <p className="subtitle">Architecture: Vision-Language Models</p>
+                    <ul className="content-list">
+                      <li>Investigated model generalization under dynamic image conditions.</li>
+                      <li>Active stress-testing of visual modalities.</li>
+                    </ul>
+                    <div className="project-links">
+                      <a href="https://github.com/Yashd1722/instruct-" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                        <i className="fab fa-github"></i> Code
+                      </a>
+                    </div>
+                  </Card3D>
+                </ScrollReveal3D>
+
+                <ScrollReveal3D delay={0.4}>
+                  <Card3D variant="projects" className="project-card">
+                    <div className="project-header">
+                      <h3>Gender Classification</h3>
+                      <span className="badge">v2022.9</span>
+                    </div>
+                    <p className="subtitle">Architecture: OpenCV Stream</p>
+                    <ul className="content-list">
+                      <li>Real-time capable computer vision recognition algorithm.</li>
+                      <li>Continuous preprocessing stream with data augmentation hooks.</li>
+                    </ul>
+                  </Card3D>
+                </ScrollReveal3D>
+              </div>
+            </div>
+          </section>
+
+          <div className="section-divider"></div>
+
+          {/* ════════════ SKILLS SECTION ════════════ */}
+          <section id="skills">
+            <View className="view-container">
+              <Skills3D />
+            </View>
+            <div className="container">
+              <ScrollReveal3D>
+                <h2 className="section-title">model.compile()</h2>
+                <p className="section-subtitle"># Neural Parameters & Tooling</p>
+              </ScrollReveal3D>
+
+              <ScrollReveal3D delay={0.15}>
+                <SkillsGrid />
+              </ScrollReveal3D>
+            </div>
+          </section>
+
+          <div className="section-divider"></div>
+
+          {/* ════════════ LANGUAGES SECTION ════════════ */}
+          <section id="languages">
+            <div className="container">
+              <ScrollReveal3D>
+                <h2 className="section-title">nlp.tokenize()</h2>
+                <p className="section-subtitle"># Language Protocols</p>
+              </ScrollReveal3D>
+
+              <div className="grid-2">
+                <ScrollReveal3D delay={0.1}>
+                  <Card3D variant="languages" className="lang-card">
+                    <i className="fas fa-language lang-icon"></i>
+                    <h3>English</h3>
+                    <h4>B2 — Upper Intermediate</h4>
+                    <div className="progress-cylinder">
+                      <div className="progress-fill" style={{ width: '75%' }}></div>
+                    </div>
+                  </Card3D>
+                </ScrollReveal3D>
+
+                <ScrollReveal3D delay={0.2}>
+                  <Card3D variant="languages" className="lang-card">
+                    <i className="fas fa-language lang-icon"></i>
+                    <h3>Deutsch</h3>
+                    <h4>A2 — Elementary</h4>
+                    <div className="progress-cylinder">
+                      <div className="progress-fill" style={{ width: '35%' }}></div>
+                    </div>
+                  </Card3D>
+                </ScrollReveal3D>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        {/* Footer */}
+        <footer>
+          <div className="footer-content">
+            <p className="footer-text">
+              <span>&gt;</span> system.exit(<span>"© 2025 Yashkumar Dhameliya. Engineering Intelligence."</span>)
+            </p>
+            <div className="footer-links">
+              <a href="https://github.com/Yashd1722" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                <i className="fab fa-github"></i>
+              </a>
+              <a href="https://www.linkedin.com/in/yashkumar-dhameliya" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                <i className="fab fa-linkedin-in"></i>
+              </a>
+              <a href="mailto:yashdhameliya03@gmail.com" aria-label="Email">
+                <i className="fas fa-envelope"></i>
+              </a>
             </div>
           </div>
-        </section>
-      </main>
-
-      <footer>
-        <div className="footer-content">
-          <p style={{ fontFamily: 'monospace', color: 'var(--color-primary)' }}>&gt; system.exit("© 2024 Yashkumar Dhameliya. Engineering Intelligence.")</p>
-          <div className="footer-links">
-            <a href="https://github.com/Yashd1722" target="_blank" rel="noopener noreferrer"><i className="fab fa-github"></i></a>
-            <a href="https://www.linkedin.com/in/yashkumar-dhameliya" target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin-in"></i></a>
-            <a href="mailto:yashdhameliya03@gmail.com"><i className="fas fa-envelope"></i></a>
-          </div>
-        </div>
-      </footer>
-
-      <style>{`
-        .cursor-blink {
-          display: inline-block;
-          width: 10px;
-          height: 1.2em;
-          background-color: #b8ffe9;
-          vertical-align: middle;
-          animation: blink 1s step-end infinite;
-        }
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
-        }
-        
-        /* Interactive dynamic node hover effect */
-        .interactive-node {
-          transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
-          position: relative;
-        }
-        
-        /* A gradient glow that follows the mouse using CSS variables set onMouseMove */
-        .interactive-node::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          border-radius: inherit;
-          opacity: 0;
-          transition: opacity 0.3s ease;
-          background: radial-gradient(
-            600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-            rgba(221, 139, 251, 0.06),
-            transparent 40%
-          );
-          pointer-events: none;
-          z-index: 10;
-        }
-        
-        .interactive-node:hover::after {
-          opacity: 1;
-        }
-        
-        .interactive-node:hover {
-          transform: translateY(-8px) scale(1.02);
-          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(114, 220, 255, 0.2);
-        }
-      `}</style>
-    </>
+        </footer>
+      </div>
+    </div>
   );
 }
 
